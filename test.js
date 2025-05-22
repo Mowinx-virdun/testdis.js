@@ -21,12 +21,8 @@ const client = new Client({
   ] 
 });
 
-// Toutes les réponses stockées par questionId
-// questionId => Map { userId => [ {username, answer}, ... ] }
 const allAnswers = new Map();
 
-// Pour simplifier, on stocke en mémoire l'ID de la question active
-// Quand on lance !quiz, on génère un ID unique et on le garde en mémoire
 let currentQuestionId = null;
 
 client.once(Events.ClientReady, () => {
@@ -36,13 +32,10 @@ client.once(Events.ClientReady, () => {
 client.on(Events.MessageCreate, async (message) => {
   if (message.author.bot || !message.content.startsWith('!quiz')) return;
 
-  // Supprime la commande !quiz
   await message.delete();
 
-  // Crée un nouvel ID pour la question (timestamp par exemple)
   currentQuestionId = Date.now().toString();
 
-  // Initialise la Map des réponses pour cette question
   allAnswers.set(currentQuestionId, new Map());
 
   const embed = new EmbedBuilder()
@@ -129,4 +122,15 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
 client.login(process.env.TOKEN).catch(err => {
   console.error("Erreur lors de la connexion :", err);
+});
+
+const express = require('express');
+const app = express();
+
+app.get('/', (req, res) => {
+  res.send('Bot is online');
+});
+
+app.listen(3000, () => {
+  console.log('Web server is running on port 3000');
 });
